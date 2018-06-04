@@ -6,12 +6,6 @@ void set_vec3(vec3 * v, float const x, float const y, float const z) {
    (*v)[2] = z;
 }
 
-void copy_vec3(vec3 * v, vec3 const other) {
-   (*v)[0] = other[0];
-   (*v)[1] = other[1];
-   (*v)[2] = other[2];
-}
-
 void set_colour(vec3 * c, float const r, float const g, float const b) {
    (*c)[0] = r / 255.f;
    (*c)[1] = g / 255.f;

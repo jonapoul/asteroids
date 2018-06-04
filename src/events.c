@@ -24,7 +24,7 @@ gboolean on_idle(gpointer * data) {
    player.pos[1] += player.y_speed;
 
    /* activate bullets */
-   for (int i = 0; i < MAX_BULLETS; ++i) {
+   for (int i = 0; i < NUM_BULLETS; ++i) {
       if (player.bullets[i].active == FALSE) {
          continue;
       }
@@ -36,6 +36,16 @@ gboolean on_idle(gpointer * data) {
       player.bullets[i].pos[0] -= dx;
       player.bullets[i].pos[1] += dy;
       player.bullets[i].ticks--;
+   }
+
+   for (int i = 0; i < NUM_ASTEROIDS; ++i) {
+      rock * const r = &(asteroid.rocks[i]);
+      if (r->active == FALSE) {
+         continue;
+      }
+      r->pos[0] += r->x_speed;
+      r->pos[1] += r->y_speed;
+      r->angle  += r->angle_speed;
    }
 
    gtk_widget_queue_draw(GTK_WIDGET(data));
@@ -60,14 +70,14 @@ gboolean on_keydown(GtkWidget * widget, GdkEventKey * event) {
 
       /* shoot */
       case GDK_KEY_space:
-         for (int i = 0; player.space == FALSE && i < MAX_BULLETS; ++i) {
+         for (int i = 0; player.space == FALSE && i < NUM_BULLETS; ++i) {
             if (player.bullets[i].active) {
                continue;
             }
             player.bullets[i].active = TRUE;
             player.bullets[i].angle = player.angle;
             player.bullets[i].ticks = player.num_ticks;
-            copy_vec3(&player.bullets[i].pos, player.pos);
+            vec3_copy(player.pos, player.bullets[i].pos);
             break;
          }
          player.space = TRUE;

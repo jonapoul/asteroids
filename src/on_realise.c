@@ -53,9 +53,42 @@ static void init_bullets() {
                 GL_STATIC_DRAW);
    player.bullet_tex   = shader_load_texture("sprites/bullet.png");
    player.num_ticks    = 70;
-   for (int i = 0; i < MAX_BULLETS; i++) {
+   for (int i = 0; i < NUM_BULLETS; i++) {
       player.bullets[i].active = FALSE;
-      player.bullets[i].speed  = 6.0;
+      player.bullets[i].speed  = 10.0;
+   }
+}
+
+static void init_asteroid() {
+   asteroid.radius = 40.0;
+   GLfloat const asteroid_vertices[] = {
+      -asteroid.radius, -asteroid.radius, 0.0, 0.0,
+      -asteroid.radius,  asteroid.radius, 0.0, 1.0,
+       asteroid.radius,  asteroid.radius, 1.0, 1.0,
+
+      -asteroid.radius, -asteroid.radius, 0.0, 0.0,
+       asteroid.radius,  asteroid.radius, 1.0, 1.0,
+       asteroid.radius, -asteroid.radius, 1.0, 0.0
+   };
+   glGenBuffers(1, &asteroid.vbo);
+   glBindBuffer(GL_ARRAY_BUFFER, asteroid.vbo);
+   glBufferData(GL_ARRAY_BUFFER,
+                sizeof(asteroid_vertices),
+                asteroid_vertices,
+                GL_STATIC_DRAW);
+   asteroid.tex = shader_load_texture("sprites/asteroid.png");
+   for (int i = 0; i < NUM_ASTEROIDS; ++i) {
+      rock * const r = &(asteroid.rocks[i]);
+      r->active = TRUE;
+      set_vec3(&(r->pos),
+               rand_float_in_range(0.0, VIEWPORT_WIDTH),
+               rand_float_in_range(0.0, VIEWPORT_WIDTH),
+               0.0);
+      r->angle       = rand_float_in_range( 0.0, 2*M_PI);
+      r->x_speed     = rand_float_in_range(-2.0, 2.0);
+      r->y_speed     = rand_float_in_range(-2.0, 2.0);
+      r->angle_speed = rand_float_in_range(-0.1, 0.1);
+      r->size        = rand_float_in_range( 0.2, 3.0); // relative to r->radius
    }
 }
 
@@ -79,6 +112,7 @@ void on_realise(GtkGLArea * area) {
 
    init_player();
    init_bullets();
+   init_asteroid();
 
    /* load program */
    program = shader_load_program("shader/vertex.glsl",
