@@ -20,14 +20,43 @@ static void init_player() {
    mat4_translate(player.pos, player.mvp);
    player.tex         = shader_load_texture("sprites/player.png");
    player.up          = FALSE;
+   player.down        = FALSE;
    player.left        = FALSE;
    player.right       = FALSE;
+   player.space       = FALSE;
    player.angle       = 0.0;
    player.x_speed     = 0.0;
    player.y_speed     = 0.0;
    player.force       = 0.1;
    player.max_speed   = 8.0;
    player.angle_speed = 0.05;
+}
+
+static void init_bullets() {
+   player.bullet_width  = 10.0;
+   player.bullet_height = 10.0;
+   GLfloat const bullet_vertices[] = {
+      -player.bullet_width, -player.bullet_height, 0.0, 0.0,
+      -player.bullet_width,  player.bullet_height, 0.0, 1.0,
+       player.bullet_width,  player.bullet_height, 1.0, 1.0,
+
+      -player.bullet_width, -player.bullet_height, 0.0, 0.0,
+       player.bullet_width,  player.bullet_height, 1.0, 1.0,
+       player.bullet_width, -player.bullet_height, 1.0, 0.0
+   };
+
+   glGenBuffers(1, &player.bullet_vbo);
+   glBindBuffer(GL_ARRAY_BUFFER, player.bullet_vbo);
+   glBufferData(GL_ARRAY_BUFFER,
+                sizeof(bullet_vertices),
+                bullet_vertices,
+                GL_STATIC_DRAW);
+   player.bullet_tex   = shader_load_texture("sprites/bullet.png");
+   player.num_ticks    = 70;
+   for (int i = 0; i < MAX_BULLETS; i++) {
+      player.bullets[i].active = FALSE;
+      player.bullets[i].speed  = 6.0;
+   }
 }
 
 void on_realise(GtkGLArea * area) {
@@ -49,6 +78,7 @@ void on_realise(GtkGLArea * area) {
    glBindVertexArray(vao);
 
    init_player();
+   init_bullets();
 
    /* load program */
    program = shader_load_program("shader/vertex.glsl",

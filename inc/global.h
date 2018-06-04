@@ -9,6 +9,7 @@
 
 #define VIEWPORT_WIDTH  640
 #define VIEWPORT_HEIGHT 480
+#define MAX_BULLETS     10
 #define print_vec3(v)   print_vec3_impl(v,#v)
 
 /* on_realise.c */
@@ -42,6 +43,15 @@ GLint  uniform_mytexture;
 GLint  uniform_mvp;
 GLuint vbo_triangle;
 
+/* structs */
+typedef struct {
+   float angle;
+   vec3 pos;
+   gboolean active;
+   int ticks;
+   float speed;
+} bullet;
+
 /* struct instances */
 struct {
    GLuint vbo;
@@ -55,10 +65,19 @@ struct {
    float width;
    float height;
    gboolean up;
+   gboolean down;
    gboolean left;
    gboolean right;
+   gboolean space;
    float angle;
    float angle_speed;
+
+   GLuint bullet_vbo;
+   GLuint bullet_tex;
+   int num_ticks;
+   float bullet_width;
+   float bullet_height;
+   bullet bullets[MAX_BULLETS];
 } player;
 
 #endif
