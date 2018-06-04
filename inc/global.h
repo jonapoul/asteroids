@@ -50,8 +50,15 @@ struct {
    vec3 pos;
    float x_speed;
    float y_speed;
+   float max_speed;
+   float force;
    float width;
    float height;
+   gboolean up;
+   gboolean left;
+   gboolean right;
+   float angle;
+   float angle_speed;
 } player;
 
 #endif

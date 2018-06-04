@@ -18,7 +18,16 @@ static void init_player() {
                 GL_STATIC_DRAW);
    set_vec3(&player.pos,  VIEWPORT_WIDTH/2.f, VIEWPORT_HEIGHT/2.f, 0.f);
    mat4_translate(player.pos, player.mvp);
-   player.tex = shader_load_texture("sprites/player.png");
+   player.tex         = shader_load_texture("sprites/player.png");
+   player.up          = FALSE;
+   player.left        = FALSE;
+   player.right       = FALSE;
+   player.angle       = 0.0;
+   player.x_speed     = 0.0;
+   player.y_speed     = 0.0;
+   player.force       = 0.1;
+   player.max_speed   = 8.0;
+   player.angle_speed = 0.05;
 }
 
 void on_realise(GtkGLArea * area) {

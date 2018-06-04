@@ -16,6 +16,8 @@ static void attrib_pointers() {
 }
 
 void on_render(GtkGLArea * area) {
+   g_print("angle = %6.2f dx = %6.2f dy = %6.2f\n",
+           player.angle, player.x_speed, player.y_speed);
    /* reset canvas */
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
    glUseProgram(program);
@@ -29,6 +31,10 @@ void on_render(GtkGLArea * area) {
    glActiveTexture(GL_TEXTURE0);
    glBindTexture(GL_TEXTURE_2D, player.tex);
    glUniform1i(uniform_mytexture, 0);
+   mat4 pos, rot;
+   mat4_translate(player.pos, pos);
+   mat4_rotate_z(player.angle, rot);
+   mat4_multiply(pos, rot, player.mvp);
    glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, player.mvp);
    glBindBuffer(GL_ARRAY_BUFFER, player.vbo);
    attrib_pointers();
