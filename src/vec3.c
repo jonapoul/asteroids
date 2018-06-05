@@ -17,7 +17,7 @@ void print_vec3_impl(vec3 const v, char const * const name) {
 }
 
 float distance(vec3 const v1, vec3 const v2) {
-   return sqrt(  pow(v1[0]-v2[0], 2.f)
-               + pow(v1[1]-v2[1], 2.f)
-               + pow(v1[2]-v2[2], 2.f));
+   return sqrt(  powf(v1[0]-v2[0], 2.f)
+               + powf(v1[1]-v2[1], 2.f)
+               + powf(v1[2]-v2[2], 2.f));
 }

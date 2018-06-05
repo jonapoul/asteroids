@@ -1,6 +1,6 @@
 #include "global.h"
 
-gboolean on_idle(gpointer * data) {
+static void move_player() {
    /* rotate player */
    if (player.right) player.angle -= player.angle_speed;
    if (player.left)  player.angle += player.angle_speed;
@@ -23,21 +23,9 @@ gboolean on_idle(gpointer * data) {
    player.pos[0] -= player.x_speed;
    player.pos[1] += player.y_speed;
 
-   /* activate bullets */
-   for (int i = 0; i < NUM_BULLETS; ++i) {
-      if (player.bullets[i].active == FALSE) {
-         continue;
-      }
-      if (player.bullets[i].ticks < 0) {
-         player.bullets[i].active = FALSE;
-      }
-      float const dx = sin(player.bullets[i].angle) * player.bullets[i].speed;
-      float const dy = cos(player.bullets[i].angle) * player.bullets[i].speed;
-      player.bullets[i].pos[0] -= dx;
-      player.bullets[i].pos[1] += dy;
-      player.bullets[i].ticks--;
-   }
+}
 
+static void move_asteroids() {
    for (int i = 0; i < NUM_ASTEROIDS; ++i) {
       rock * const r = &(asteroid.rocks[i]);
       if (r->active == FALSE) {
@@ -47,6 +35,71 @@ gboolean on_idle(gpointer * data) {
       r->pos[1] += r->y_speed;
       r->angle  += r->angle_speed;
    }
+}
+
+gboolean on_idle(gpointer * data) {
+   /* activate and move bullets */
+   int split = 0;
+   int index = 0;
+   for (int i = 0; i < NUM_BULLETS; ++i) {
+      bullet * const b = &(player.bullets[i]);
+      if (b->active == FALSE) {
+         continue;
+      }
+      if (b->ticks < 0) {
+         b->active = FALSE;
+      }
+      float const dx = sin(b->angle) * b->speed;
+      float const dy = cos(b->angle) * b->speed;
+      b->pos[0] -= dx;
+      b->pos[1] += dy;
+      b->ticks--;
+      for (int j = 0; j < NUM_ASTEROIDS; ++j) {
+         rock * const r = &(asteroid.rocks[j]);
+         if (r->active == FALSE) {
+            continue;
+         }
+         if (distance(b->pos, r->pos) < asteroid.radius * r->scale) {
+            r->active = FALSE;
+            b->active = FALSE;
+            if (r->scale < 0.5) {
+               split = 2;
+               index = j;
+            }
+            break;
+         }
+      }
+      if (!split) {
+         continue;
+      }
+      for (int j = 0; j < NUM_ASTEROIDS; ++j) {
+         rock * const r_j     = &(asteroid.rocks[j]);
+         rock * const r_index = &(asteroid.rocks[index]);
+         if (j == index || r_j->active) {
+            continue;
+         }
+         r_j->active = TRUE;
+         r_j->scale  = r_index->scale / 2.0;
+         r_j->angle  = rand_float_in_range(0.0, 2*M_PI);
+         vec3_copy(r_index->pos, r_j->pos);
+         switch (split) {
+            case 2:
+               r_j->x_speed = r_index->x_speed *  1.2f;
+               r_j->y_speed = r_index->y_speed * -1.2f;
+               break;
+            case 1:
+               r_j->x_speed = r_index->x_speed * -1.2f;
+               r_j->y_speed = r_index->y_speed *  1.2f;
+               break;
+         }
+         split--;
+         if (!split) {
+            break;
+         }
+      }
+   }
+   move_player();
+   move_asteroids();
 
    gtk_widget_queue_draw(GTK_WIDGET(data));
    return TRUE;
@@ -71,13 +124,14 @@ gboolean on_keydown(GtkWidget * widget, GdkEventKey * event) {
       /* shoot */
       case GDK_KEY_space:
          for (int i = 0; player.space == FALSE && i < NUM_BULLETS; ++i) {
-            if (player.bullets[i].active) {
+            bullet * const b = &(player.bullets[i]);
+            if (b->active) {
                continue;
             }
-            player.bullets[i].active = TRUE;
-            player.bullets[i].angle = player.angle;
-            player.bullets[i].ticks = player.num_ticks;
-            vec3_copy(player.pos, player.bullets[i].pos);
+            b->active = TRUE;
+            b->angle = player.angle;
+            b->ticks = player.num_ticks;
+            vec3_copy(player.pos, b->pos);
             break;
          }
          player.space = TRUE;
@@ -85,6 +139,7 @@ gboolean on_keydown(GtkWidget * widget, GdkEventKey * event) {
 
       /* quit */
       case GDK_KEY_Escape:
+         g_print("\n");
          exit(1);
          break;
    }

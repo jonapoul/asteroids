@@ -80,7 +80,7 @@ static void mirror_asteroid(int const i) {
    rock * const r = &(asteroid.rocks[i]);
    /* check if we need to mirror */
    gboolean draw_mirror = FALSE;
-   float const size = r->size * asteroid.radius;
+   float const size = r->scale * asteroid.radius;
    if (r->pos[0] > VIEWPORT_WIDTH - size) {
       r->pos[0] -= VIEWPORT_WIDTH;
       draw_mirror = TRUE;
@@ -110,7 +110,7 @@ void on_render(GtkGLArea * area) {
    g_print("input = (%d %d %d %d) angle = %6.2f dx = %6.2f dy = %6.2f sizes = (%.2f %.2f %.2f)\r",
            player.up, player.down, player.left, player.right,
            player.angle, player.x_speed, player.y_speed,
-           asteroid.rocks[0].size, asteroid.rocks[1].size, asteroid.rocks[2].size);
+           asteroid.rocks[0].scale, asteroid.rocks[1].scale, asteroid.rocks[2].scale);
    /* reset canvas */
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
    glUseProgram(program);
@@ -163,7 +163,7 @@ void on_render(GtkGLArea * area) {
          continue;
       }
       vec3 scale_vec;
-      set_vec3(&scale_vec, r->size, r->size, 0.0);
+      set_vec3(&scale_vec, r->scale, r->scale, 0.0);
       mat4 scale, pos, rot;
       mat4_scale(scale_vec, scale);
       mat4_translate(r->pos, pos);

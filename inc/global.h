@@ -10,6 +10,7 @@
 #define VIEWPORT_WIDTH  640
 #define VIEWPORT_HEIGHT 480
 #define NUM_BULLETS     20
+#define MAX_ASTEROIDS   10
 #define NUM_ASTEROIDS   3
 #define print_vec3(v)   print_vec3_impl(v,#v)
 
@@ -93,7 +94,7 @@ typedef struct {
    float x_speed;
    float y_speed;
    float angle_speed;
-   float size;
+   float scale;
    gboolean active;
 } rock;
 
@@ -102,7 +103,7 @@ struct {
    GLuint tex;
    mat4 mvp;
    float radius;
-   rock rocks[NUM_ASTEROIDS];
+   rock rocks[MAX_ASTEROIDS];
 } asteroid;
 
 #endif

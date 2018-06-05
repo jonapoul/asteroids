@@ -77,9 +77,9 @@ static void init_asteroid() {
                 asteroid_vertices,
                 GL_STATIC_DRAW);
    asteroid.tex = shader_load_texture("sprites/asteroid.png");
-   for (int i = 0; i < NUM_ASTEROIDS; ++i) {
+   for (int i = 0; i < MAX_ASTEROIDS; ++i) {
       rock * const r = &(asteroid.rocks[i]);
-      r->active = TRUE;
+      r->active = (i < NUM_ASTEROIDS ? TRUE : FALSE);
       set_vec3(&(r->pos),
                rand_float_in_range(0.0, VIEWPORT_WIDTH),
                rand_float_in_range(0.0, VIEWPORT_WIDTH),
@@ -88,7 +88,7 @@ static void init_asteroid() {
       r->x_speed     = rand_float_in_range(-2.0, 2.0);
       r->y_speed     = rand_float_in_range(-2.0, 2.0);
       r->angle_speed = rand_float_in_range(-0.1, 0.1);
-      r->size        = rand_float_in_range( 0.2, 3.0); // relative to r->radius
+      r->scale       = rand_float_in_range( 0.2, 3.0); // relative to r->radius
    }
 }
 
